@@ -1,9 +1,23 @@
+import os
+import urlparse
+
 from redis import StrictRedis
 
 from flask import Flask, abort, jsonify, request
 app = Flask(__name__)
 
-redis = StrictRedis()
+HEROKU = 'HEROKU' in os.environ
+
+if HEROKU:
+    urlparse.uses_netloc.append('redis')
+    redis_url = urlparse.urlparse(os.environ['REDISTOGO_URL'])
+    redis = StrictRedis(
+        host=redis_url.hostname,
+        port=redis_url.port,
+        password=redis_url.password
+    )
+else:
+    redis = StrictRedis()
 
 
 @app.route('/')
@@ -42,4 +56,8 @@ def set_rate(code, date, rate):
     return redis.hset(code, date, rate)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    if not HEROKU:
+        app.debug = True
+
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
