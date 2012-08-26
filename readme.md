@@ -28,7 +28,7 @@ Returns a list of currencies which are tracked.
 ```
 
 ### /\<code>/ GET
-Returns a list of dates which have exchange rates for the currency code. Returns a 404 if not found.
+Returns a list of dates which have exchange rates for the currency code. Returns `404` if not found.
 
 ```
 {
